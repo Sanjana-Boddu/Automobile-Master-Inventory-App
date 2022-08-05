@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import mysql from 'mysql'; // https://expressjs.com/en/guide/database-integration.html
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -15,6 +16,7 @@ import { routes } from './routes.js';
 
 const app = new express();
 app.use(express.json()); // Required to handle JSON POST requests.
+app.use(cors());
 
 const db = mysql.createConnection({
     host: HOST,
@@ -24,6 +26,7 @@ const db = mysql.createConnection({
 });
 db.connect();
 
+// TODO: Add rate limiter and invisible Captcha.
 app.post(routes.login, async (req, res) => {
     try {
         const {
@@ -54,16 +57,16 @@ app.post(routes.login, async (req, res) => {
                 if (!(await bcrypt.compare(password, actualPassword))) {
                     throw error;
                 }
-                // Create a token.
-                const token = jwt.sign(
-                    {user_id: id, email: lowerCaseEmail},
-                    TOKEN_KEY,
-                    {
-                        expiresIn: '12h',
-                    }
-                );
-                res.status(200).send({token});
             }
+            // Create a token.
+            const token = jwt.sign(
+                {user_id: id, email: lowerCaseEmail},
+                TOKEN_KEY,
+                {
+                    expiresIn: '24h',
+                }
+            );
+            res.status(200).send({token});
         });
     } catch (error) {
         console.log(error);

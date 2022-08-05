@@ -1,21 +1,9 @@
 import { Header } from './Header/Header';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Add } from './Add/Add';
-import { Cars } from './Cars/Cars';
+import { list } from './helpers/constants';
 import './App.css';
 
-const list = [
-    {
-        route: '/',
-        text: 'Cars',
-        component: <Cars />,
-    },
-    {
-        route: '/add',
-        text: 'Add Car',
-        component: <Add />,
-    }];
-
+// TODO: Add classnames, SCSS, propTypes, Typescript2.
 function App() {
     return (
         <BrowserRouter>

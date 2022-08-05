@@ -1,20 +1,23 @@
+:root {
+    --header-height: 60px;
+}
+
 .header {
     display: flex;
-    height: 60px;
+    height: var(--header-height);
     width: 100%;
     background-color: dodgerblue;
 }
 
 .menu-item {
     width: 100px;
-    border: 1px solid #f2f2f2;
     cursor: pointer;
     text-align: center;
     color: white;
-    padding: 8px;
+    text-decoration: none;
+    line-height: var(--header-height);
 }
 
 .active {
-    background-color: lightskyblue;
-    border: 1px solid blue;
+    background-color: rgb(0, 103, 206);
 }
