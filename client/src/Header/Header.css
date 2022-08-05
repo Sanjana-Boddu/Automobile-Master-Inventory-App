@@ -1,0 +1,20 @@
+.header {
+    display: flex;
+    height: 60px;
+    width: 100%;
+    background-color: dodgerblue;
+}
+
+.menu-item {
+    width: 100px;
+    border: 1px solid #f2f2f2;
+    cursor: pointer;
+    text-align: center;
+    color: white;
+    padding: 8px;
+}
+
+.active {
+    background-color: lightskyblue;
+    border: 1px solid blue;
+}
