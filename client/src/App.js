@@ -18,14 +18,12 @@ const list = [
 
 function App() {
     return (
-        <>
-            <BrowserRouter>
-                <Header list={list} />
-                <Routes>
-                    {list.map(item => <Route key={item.route} path={item.route.substring(1)} element={item.component} />)}
-                </Routes>
-            </BrowserRouter>
-        </>
+        <BrowserRouter>
+            <Header list={list} />
+            <Routes>
+                {list.map(item => <Route key={item.route} path={item.route.substring(1)} element={item.component} />)}
+            </Routes>
+        </BrowserRouter>
     );
 }
 // https://reactrouter.com/docs/en/v6/getting-started/tutorial
