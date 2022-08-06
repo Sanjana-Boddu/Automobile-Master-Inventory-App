@@ -1,11 +1,19 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import { API } from '../helpers/constants';
+import { AuthContext } from '../Context';
 
 export const Login = () => {
     const navigate = useNavigate();
+    const {token} = useContext(AuthContext);
 
+    useEffect(() => {
+        if (token !== null) {
+            navigate('/', { replace: true });
+        }
+    }, [navigate, token]);
+    
     const [state, setState] = useState({
         email: '',
         password: '',
@@ -50,7 +58,7 @@ export const Login = () => {
             });
             if (response.ok) {
                 const data = await response.json();
-                if (data) {
+                if (data?.token) {
                     localStorage.setItem('token', data.token);
                     setState({ loading: false });
                     navigate('/', { replace: true });

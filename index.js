@@ -35,9 +35,12 @@ app.post(routes.login, async (req, res) => {
         } = req.body;
         const lowerCaseEmail = email.toLowerCase();
         const encryptedPassword = await bcrypt.hash(password, 10);
+        let totalErrors = 0;
         db.query('SELECT id, password FROM users WHERE email = ?', [lowerCaseEmail], async (error, results) => {
             if (error) {
-                throw error;
+                console.log(error);
+                totalErrors++;
+                return;
             }
             let id;
             if (!results.length) {
@@ -47,7 +50,9 @@ app.post(routes.login, async (req, res) => {
                     registered: Date.now()
                 }, (error, results) => {
                     if (error) {
-                        throw error;
+                        console.log(error);
+                        totalErrors++;
+                        return;
                     }
                     id = results.insertId;
                 });
@@ -55,19 +60,28 @@ app.post(routes.login, async (req, res) => {
                 id = results[0].id;
                 const actualPassword = results[0].password;
                 if (!(await bcrypt.compare(password, actualPassword))) {
-                    throw error;
+                    console.log(error);
+                    totalErrors++;
+                    return;
                 }
             }
-            // Create a token.
-            const token = jwt.sign(
-                {user_id: id, email: lowerCaseEmail},
-                TOKEN_KEY,
-                {
-                    expiresIn: '24h',
-                }
-            );
-            res.status(200).send({token});
+            if (id !== undefined) {
+                // Create a token.
+                const token = jwt.sign(
+                    { user_id: id, email: lowerCaseEmail },
+                    TOKEN_KEY,
+                    {
+                        expiresIn: '24h',
+                    }
+                );
+                res.status(200).send({ token });
+            } else {
+                totalErrors++;
+            }
         });
+        if (totalErrors > 0) {
+            res.status(401).send('Authentication Failed!');
+        }
     } catch (error) {
         console.log(error);
         res.status(401).send('Authentication Failed!');
@@ -80,7 +94,7 @@ app.get(routes.getCarsById, checkAuthorization, (req, res) => {
         if (!res.locals.user?.user_id) {
             throw 'Error! Not authorized.';
         }
-        const {headers, body, params: {id}} = req;
+        const { headers, body, params: { id } } = req;
         db.query('SELECT * FROM cars WHERE id = ?', [id], (error, results, fields) => {
             if (error) {
                 throw error;
@@ -102,7 +116,7 @@ app.get(routes.getAllCars, checkAuthorization, (req, res) => {
         if (!res.locals.user?.user_id) {
             throw 'Error! Not authorized.';
         }
-        const {headers, body, params: {id}} = req;
+        const { headers, body, params: { id } } = req;
         db.query('SELECT * FROM cars', (error, results, fields) => {
             if (error) {
                 throw error;
@@ -120,7 +134,7 @@ app.post(routes.addCar, checkAuthorization, (req, res) => {
         if (!res.locals.user?.user_id) {
             throw 'Error! Not authorized.';
         }
-        const {headers, body} = req;
+        const { headers, body } = req;
         db.query('INSERT INTO cars SET ?', body, function (error, results, fields) {
             if (error) {
                 throw error;

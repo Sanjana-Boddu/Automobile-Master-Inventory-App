@@ -18,6 +18,10 @@
     line-height: var(--header-height);
 }
 
+.right {
+    margin-left: auto;
+}
+
 .active {
     background-color: rgb(0, 103, 206);
 }
