@@ -15,8 +15,8 @@ import { checkAuthorization } from './middlware.js';
 import { routes } from './routes.js';
 
 const app = new express();
-app.use(express.json()); // Required to handle JSON POST requests.
 app.use(cors());
+app.use(express.json()); // Required to handle JSON POST requests.
 
 const db = mysql.createConnection({
     host: HOST,
@@ -26,6 +26,14 @@ const db = mysql.createConnection({
 });
 db.connect();
 
+const getToken = (user_id, email) => jwt.sign(
+        { user_id, email },
+        TOKEN_KEY,
+        {
+            expiresIn: '24h',
+        }
+    );
+
 // TODO: Add rate limiter and invisible Captcha.
 app.post(routes.login, async (req, res) => {
     try {
@@ -34,7 +42,6 @@ app.post(routes.login, async (req, res) => {
             password
         } = req.body;
         const lowerCaseEmail = email.toLowerCase();
-        const encryptedPassword = await bcrypt.hash(password, 10);
         let totalErrors = 0;
         db.query('SELECT id, password FROM users WHERE email = ?', [lowerCaseEmail], async (error, results) => {
             if (error) {
@@ -42,8 +49,9 @@ app.post(routes.login, async (req, res) => {
                 totalErrors++;
                 return;
             }
-            let id;
-            if (!results.length) {
+            if (results.length === 0) {
+                // Register new user.
+                const encryptedPassword = await bcrypt.hash(password, 10);
                 db.query('INSERT INTO users SET ?', {
                     email: lowerCaseEmail,
                     password: encryptedPassword,
@@ -54,29 +62,17 @@ app.post(routes.login, async (req, res) => {
                         totalErrors++;
                         return;
                     }
-                    id = results.insertId;
+                    res.status(200).send({ token: getToken(results.insertId, lowerCaseEmail) });
                 });
             } else {
-                id = results[0].id;
+                // Verify password and authenticate.
                 const actualPassword = results[0].password;
                 if (!(await bcrypt.compare(password, actualPassword))) {
                     console.log(error);
                     totalErrors++;
                     return;
                 }
-            }
-            if (id !== undefined) {
-                // Create a token.
-                const token = jwt.sign(
-                    { user_id: id, email: lowerCaseEmail },
-                    TOKEN_KEY,
-                    {
-                        expiresIn: '24h',
-                    }
-                );
-                res.status(200).send({ token });
-            } else {
-                totalErrors++;
+                res.status(200).send({ token: getToken(results[0].id, lowerCaseEmail) });
             }
         });
         if (totalErrors > 0) {
