@@ -111,13 +111,16 @@ app.get(routes.getCarsById, checkAuthorization, (req, res) => {
 
 app.get(routes.getAllCars, checkAuthorization, (req, res) => {
     try {
-        if (!res.locals.user?.user_id) {
+        const id = res.locals.user?.user_id;
+        if (!id) {
             throw 'Error! Not authorized.';
         }
-        const { headers, body, params: { id } } = req;
-        db.query('SELECT * FROM cars', (error, results, fields) => {
+        const { headers, body } = req;
+        db.query('SELECT id, name, brand FROM cars WHERE user_id = ?', [id], (error, results) => {
             if (error) {
-                throw error;
+                console.log(error);
+                res.status(500).send('Internal Server Error!');
+                return;
             }
             res.status(200).send(results);
         });
@@ -132,12 +135,15 @@ app.post(routes.addCar, checkAuthorization, (req, res) => {
         if (!res.locals.user?.user_id) {
             throw 'Error! Not authorized.';
         }
-        const { headers, body } = req;
-        db.query('INSERT INTO cars SET ?', body, function (error, results, fields) {
+        const { body } = req;
+        body.user_id = res.locals.user?.user_id;
+        db.query('INSERT INTO cars SET ?', body, function (error) {
             if (error) {
-                throw error;
+                console.log(error);
+                res.status(500).send('Internal Server Error!');
+                return;
             }
-            res.status(200).send('ok');
+            res.status(200).send({ success: true });
         });
     } catch (error) {
         console.log(error);

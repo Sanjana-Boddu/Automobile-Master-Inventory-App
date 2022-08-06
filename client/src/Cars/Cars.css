@@ -1,0 +1,50 @@
+:root {
+  --table-line-height: 60px;
+  --table-border: 1px solid #999999;
+}
+
+.title {
+    text-align: center;
+}
+
+.loading {
+    text-align: center;
+}
+
+.error {
+    text-align: center;
+    padding: 5px;
+    background-color: rgb(236, 59, 59);
+    color: white;
+}
+
+.table-container {
+    margin: 5px auto;
+    width: 95%
+}
+
+.table-row {
+    display: flex;
+    height: var(--table-line-height);
+    border: var(--table-border);
+    border-top: none;
+    border-right: none;
+    line-height:  var(--table-line-height);
+}
+
+.table-header {
+    background-color: dodgerblue;
+    color: white;
+}
+
+.table-column {
+    width: 33.33%;
+    text-align: center;
+    border-right: var(--table-border);
+}
+
+@media all and (min-width: 720px) {
+    .table-container {
+        width: 50%;
+    }
+}

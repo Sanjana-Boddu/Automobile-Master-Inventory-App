@@ -5,7 +5,7 @@ import {
 
 export const checkAuthorization = (req, res, next) => {
     try {
-        const token = req.headers.Authorization?.split(' ')[1];
+        const token = req.headers.authorization?.split(' ')[1];
         res.locals.user = jwt.verify(token, TOKEN_KEY);
         next();
     } catch (error) {

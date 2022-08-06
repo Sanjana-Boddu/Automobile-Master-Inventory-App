@@ -13,7 +13,7 @@ export const Header = ({ privateList = [], publicList = [] }) => {
         if (active !== location.pathname) {
             setActive(location.pathname);
         }
-    }, [token]);
+    }, [active, location.pathname]);
     
     return <div className="header">
         {token !== null && privateList.map(item => {

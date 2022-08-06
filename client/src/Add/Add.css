@@ -1,0 +1,50 @@
+.title {
+    text-align: center;
+}
+
+.loading {
+    text-align: center;
+}
+
+.error {
+    text-align: center;
+    padding: 5px;
+    background-color: rgb(236, 59, 59);
+    color: white;
+}
+
+.add-car-container {
+    margin: 5px auto;
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    padding: 8px;
+}
+
+.input-container {
+    height: 40px;
+    font-size: 16px;
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid #999999;
+    margin: 8px;
+}
+
+.submit-button {
+    color: white;
+    height: 50px;
+    text-align: center;
+    font-size: 16px;
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid #999999;
+    margin: 8px;
+    background-color: dodgerblue;
+    cursor: pointer;
+}
+
+@media all and (min-width: 720px) {
+    .add-car-container {
+        width: 50%;
+    }
+}

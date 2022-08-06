@@ -64,10 +64,10 @@ export const Login = () => {
                     setState({ loading: false });
                     navigate('/', { replace: true });
                 } else {
-                    throw 'Authentication Error';
+                    throw new Error('Authentication Error');
                 }
             } else {
-                throw 'Authentication Error';
+                throw new Error('Authentication Error');
             }
         } catch (error) {
             setState(prevState => ({
