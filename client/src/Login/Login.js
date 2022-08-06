@@ -34,7 +34,8 @@ export const Login = () => {
         return true;
     };
 
-    const submit = async () => {
+    const submit = async (event) => {
+        event.preventDefault();
         setState(prevState => ({
             ...prevState,
             error: '',
