@@ -27,12 +27,12 @@ const db = mysql.createConnection({
 db.connect();
 
 const getToken = (user_id, email) => jwt.sign(
-        { user_id, email },
-        TOKEN_KEY,
-        {
-            expiresIn: '24h',
-        }
-    );
+    { user_id, email },
+    TOKEN_KEY,
+    {
+        expiresIn: '24h',
+    }
+);
 
 // TODO: Add rate limiter and invisible Captcha.
 app.post(routes.login, async (req, res) => {
@@ -41,43 +41,45 @@ app.post(routes.login, async (req, res) => {
             email,
             password
         } = req.body;
-        const lowerCaseEmail = email.toLowerCase();
-        let totalErrors = 0;
+        const lowerCaseEmail = email?.toLowerCase();
         db.query('SELECT id, password FROM users WHERE email = ?', [lowerCaseEmail], async (error, results) => {
+            let totalErrors = 0;
             if (error) {
                 console.log(error);
-                totalErrors++;
+                res.status(401).send('Authentication Failed!');
                 return;
             }
             if (results.length === 0) {
-                // Register new user.
-                const encryptedPassword = await bcrypt.hash(password, 10);
-                db.query('INSERT INTO users SET ?', {
-                    email: lowerCaseEmail,
-                    password: encryptedPassword,
-                    registered: Date.now()
-                }, (error, results) => {
-                    if (error) {
-                        console.log(error);
-                        totalErrors++;
-                        return;
-                    }
-                    res.status(200).send({ token: getToken(results.insertId, lowerCaseEmail) });
-                });
+                try {
+                    // Register new user.
+                    const encryptedPassword = await bcrypt.hash(password, 10);
+                    db.query('INSERT INTO users SET ?', {
+                        email: lowerCaseEmail,
+                        password: encryptedPassword,
+                        registered: Date.now()
+                    }, (error, results) => {
+                        if (error) {
+                            console.log(error);
+                            res.status(401).send('Authentication Failed!');
+                            return;
+                        }
+                        res.status(200).send({ token: getToken(results.insertId, lowerCaseEmail) });
+                    });
+                } catch (error) {
+                    console.log(error);
+                    res.status(401).send('Authentication Failed!');
+                }
             } else {
                 // Verify password and authenticate.
                 const actualPassword = results[0].password;
                 if (!(await bcrypt.compare(password, actualPassword))) {
-                    console.log(error);
-                    totalErrors++;
+                    console.log('Wrong password!');
+                    res.status(401).send('Authentication Failed!');
                     return;
                 }
                 res.status(200).send({ token: getToken(results[0].id, lowerCaseEmail) });
             }
         });
-        if (totalErrors > 0) {
-            res.status(401).send('Authentication Failed!');
-        }
     } catch (error) {
         console.log(error);
         res.status(401).send('Authentication Failed!');

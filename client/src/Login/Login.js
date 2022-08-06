@@ -6,7 +6,7 @@ import { AuthContext } from '../Context';
 
 export const Login = () => {
     const navigate = useNavigate();
-    const {token} = useContext(AuthContext);
+    const {token, setToken} = useContext(AuthContext);
 
     useEffect(() => {
         if (token !== null) {
@@ -60,6 +60,7 @@ export const Login = () => {
                 const data = await response.json();
                 if (data?.token) {
                     localStorage.setItem('token', data.token);
+                    setToken(data.token);
                     setState({ loading: false });
                     navigate('/', { replace: true });
                 }
