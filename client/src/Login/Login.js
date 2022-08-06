@@ -6,14 +6,14 @@ import { AuthContext } from '../Context';
 
 export const Login = () => {
     const navigate = useNavigate();
-    const {token, setToken} = useContext(AuthContext);
+    const { token, setToken } = useContext(AuthContext);
 
     useEffect(() => {
         if (token !== null) {
             navigate('/', { replace: true });
         }
     }, [navigate, token]);
-    
+
     const [state, setState] = useState({
         email: '',
         password: '',
@@ -63,16 +63,18 @@ export const Login = () => {
                     setToken(data.token);
                     setState({ loading: false });
                     navigate('/', { replace: true });
+                } else {
+                    throw 'Authentication Error';
                 }
+            } else {
+                throw 'Authentication Error';
             }
-            setState({ loading: false });
         } catch (error) {
             setState(prevState => ({
                 ...prevState,
                 error: 'Sorry! Something went wrong.',
                 loading: false
             }));
-            console.log(error);
         }
     };
 
