@@ -7,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon ./index.js > log-file.txt",
-    "watch": "nodemon --ext js,pug --ignore public"
+    "watch": "nodemon --ext js,pug --ignore public",
+    "client": "cd client && npm start"
   },
   "author": "Sanjana",
   "license": "ISC",
